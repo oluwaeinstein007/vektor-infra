@@ -1,0 +1,48 @@
+# GitOps entry point for every vektor-platform service — §9.3: "image tags
+# consumed via GitOps PR". One ApplicationSet instead of one Application per
+# service, since the service list is just the §9.6 services/ directory.
+#
+# Each service's chart lives at vektor-platform/services/<name>/deploy/helm
+# — that path is created by that service's own roadmap task (SVC-001,
+# ML-002, etc., see ../../../../vektor-docs/docs/09-roadmap.md), not by this
+# repo. Until a service's chart exists, ArgoCD will show it OutOfSync/
+# Missing rather than erroring the whole set — that's expected during
+# Phase 0-1 and clears up as each service lands.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: vektor-platform-services
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - service: ingest-svc
+          - service: cv-inference-svc
+          - service: fusion-svc
+          - service: coa-svc
+          - service: alert-svc
+          - service: auth-svc
+          - service: audit-svc
+          - service: geospatial-svc
+          - service: logistics-svc
+          - service: reporting-svc
+  template:
+    metadata:
+      name: "vektor-platform-{{service}}"
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/vektor/vektor-platform.git
+        targetRevision: main
+        path: "services/{{service}}/deploy/helm"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: vektor-platform
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=false # namespace is owned by terraform/modules, not ArgoCD

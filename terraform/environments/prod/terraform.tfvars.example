@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars (gitignored) and fill in for your cluster.
+# vault_addr has no default deliberately — see modules/vault's note on the
+# manual init/unseal ceremony; there's no safe default to guess here.
+
+kubeconfig_path = "~/.kube/config"
+kube_context    = "vektor-prod"
+vault_addr      = "https://vault.internal.vektor.example:8200"

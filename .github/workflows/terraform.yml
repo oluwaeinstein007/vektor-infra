@@ -1,0 +1,77 @@
+# INFRA-008 / §9.8: "terraform plan posted as PR comment; policy-as-code
+# check (OPA)". apply is a separate, manually-triggered workflow gated on
+# DevOps + Security Lead approval (§9.9) — this workflow never applies.
+name: terraform
+
+on:
+  pull_request:
+    paths:
+      - "terraform/**"
+      - "policy/**"
+  push:
+    branches: [main]
+    paths:
+      - "terraform/**"
+      - "policy/**"
+
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: instrumenta/conftest-action@master
+        with:
+          files: terraform/modules
+          policy: policy
+
+  plan:
+    strategy:
+      matrix:
+        environment: [dev, prod]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/environments/${{ matrix.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.3"
+
+      - name: terraform fmt
+        run: terraform fmt -check -recursive ../../
+
+      - name: terraform init
+        run: terraform init -backend=false
+
+      - name: terraform validate
+        run: terraform validate
+
+      # Requires a KUBECONFIG_${{ matrix.environment }} repo secret pointed
+      # at a real cluster to actually succeed — fmt/validate/policy above
+      # this step don't need one, so they still gate the PR even before
+      # that secret is wired up.
+      - name: terraform plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color -lock=false
+        continue-on-error: true
+        id: plan
+
+      - name: Comment plan on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              `#### Terraform Plan — \`${{ matrix.environment }}\``,
+              "```",
+              `${{ steps.plan.outputs.stdout }}`,
+              "```",
+            ].join("\n");
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });

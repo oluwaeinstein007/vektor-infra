@@ -1,0 +1,41 @@
+# cv-train-svc + llm-cloud-svc — deployed into vektor-ml-enclave, which
+# terraform/modules/vektor-ml-enclave owns (namespace + NetworkPolicy +
+# ResourceQuota). ArgoCD only ever adds workloads here, never namespace or
+# network policy — CreateNamespace is deliberately omitted.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vektor-ml-llm-cloud-svc
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/vektor/vektor-ml.git
+    targetRevision: main
+    path: llm-cloud-svc/deploy/helm
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vektor-ml-enclave
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vektor-ml-cv-train-svc
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/vektor/vektor-ml.git
+    targetRevision: main
+    path: cv-train-svc/deploy/helm
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vektor-ml-enclave
+  # Training is a periodic batch job (§9.2 release cadence), not a
+  # continuously-synced service — auto-sync would fight a manually
+  # triggered training run.
+  syncPolicy: {}

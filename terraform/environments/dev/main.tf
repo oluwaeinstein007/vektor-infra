@@ -2,15 +2,27 @@
 # module composition exactly (same modules, different variable values) so
 # there's no "works in dev, structurally different in prod" drift.
 
-# The TS application namespace itself — every vektor-platform service
+# The TS backend-service namespace itself — every vektor-backend service
 # (SVC-001 etc.) deploys here once its own roadmap task scaffolds it. Owned
 # directly by the environment root, not a module, since it's a single
 # resource other modules only ever reference by name.
-resource "kubernetes_namespace_v1" "vektor_platform" {
+resource "kubernetes_namespace_v1" "vektor_backend" {
   metadata {
-    name = "vektor-platform"
+    name = "vektor-backend"
     labels = {
-      "vektor.io/tier" = "platform"
+      "vektor.io/tier" = "backend"
+    }
+  }
+}
+
+# The frontend namespace (vektor-web: apps/web, and eventually field-pwa) —
+# split out from the above when vektor-platform became vektor-backend +
+# vektor-web (§9.2).
+resource "kubernetes_namespace_v1" "vektor_web" {
+  metadata {
+    name = "vektor-web"
+    labels = {
+      "vektor.io/tier" = "web"
     }
   }
 }
@@ -69,5 +81,5 @@ module "istio" {
 
   # istio module labels these namespaces for sidecar injection — they must
   # exist first.
-  depends_on = [kubernetes_namespace_v1.vektor_platform, module.gateway]
+  depends_on = [kubernetes_namespace_v1.vektor_backend, kubernetes_namespace_v1.vektor_web, module.gateway]
 }

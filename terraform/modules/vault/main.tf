@@ -63,16 +63,18 @@ resource "vault_policy" "policies" {
   policy   = file(each.value)
 }
 
-# vektor-platform services (any pod whose ServiceAccount lives in the
-# vektor-platform namespace) get the vektor-platform policy; vektor-ml
+# vektor-backend services (any pod whose ServiceAccount lives in the
+# vektor-backend namespace) get the vektor-backend policy; vektor-ml
 # enclave pods get the narrower vektor-ml policy. Neither can request the
 # other's role — this is the Vault-side half of §14.2's isolation.
-resource "vault_kubernetes_auth_backend_role" "vektor_platform" {
+# vektor-web (the frontend) has no role here — it holds no secrets of its
+# own, talking to vektor-backend over its public REST/WebSocket API only.
+resource "vault_kubernetes_auth_backend_role" "vektor_backend" {
   backend                          = vault_auth_backend.kubernetes.path
-  role_name                        = "vektor-platform"
+  role_name                        = "vektor-backend"
   bound_service_account_names      = ["*"]
-  bound_service_account_namespaces = ["vektor-platform"]
-  token_policies                   = [vault_policy.policies["vektor-platform"].name]
+  bound_service_account_namespaces = ["vektor-backend"]
+  token_policies                   = [vault_policy.policies["vektor-backend"].name]
   token_ttl                        = 900
   token_max_ttl                    = 3600
 }

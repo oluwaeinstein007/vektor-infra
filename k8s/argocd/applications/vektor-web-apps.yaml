@@ -1,19 +1,19 @@
-# apps/ (web dashboard, field PWA, API gateway plugins) — §9.6. Small enough
+# apps/ (web dashboard, field PWA) — §9.6, vektor-web repo. Small enough
 # list that individual Applications read more clearly than an ApplicationSet.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: vektor-platform-web
+  name: vektor-web-web
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/vektor/vektor-platform.git
+    repoURL: https://github.com/vektor/vektor-web.git
     targetRevision: main
     path: apps/web/deploy/helm
   destination:
     server: https://kubernetes.default.svc
-    namespace: vektor-platform
+    namespace: vektor-web
   syncPolicy:
     automated:
       prune: true
@@ -22,17 +22,17 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: vektor-platform-field-pwa
+  name: vektor-web-field-pwa
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/vektor/vektor-platform.git
+    repoURL: https://github.com/vektor/vektor-web.git
     targetRevision: main
     path: apps/field-pwa/deploy/helm
   destination:
     server: https://kubernetes.default.svc
-    namespace: vektor-platform
+    namespace: vektor-web
   syncPolicy:
     automated:
       prune: true

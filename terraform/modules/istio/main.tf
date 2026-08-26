@@ -73,22 +73,23 @@ resource "kubernetes_manifest" "mesh_peer_auth" {
 # (`source.principals: ["cluster.local/ns/<ns>/sa/<name>"]`), and no
 # ServiceAccount-per-service naming convention exists yet anywhere in this
 # repo — actual Deployment manifests (and therefore ServiceAccounts) are
-# expected to land in vektor-platform's own repo per-service, the same
-# "this repo is bootstrap/ops tooling, application manifests land next to
-# the application" split vektor-edge's README documents for its own
-# placeholder image tags. Writing AuthorizationPolicy rules against guessed
-# ServiceAccount names now would be unverifiable config that might not even
-# match what gets deployed — worse than no policy, since it reads as done
-# when it isn't. A default-deny AuthorizationPolicy specifically must NOT
-# be added without its matching allow-rules in the same change: on a real
-# cluster it would immediately block every request into vektor-platform,
-# including Kong's own ingress traffic.
+# expected to land in vektor-backend's own repo per-service (or
+# vektor-web's, for the frontend), the same "this repo is bootstrap/ops
+# tooling, application manifests land next to the application" split
+# vektor-edge's README documents for its own placeholder image tags.
+# Writing AuthorizationPolicy rules against guessed ServiceAccount names
+# now would be unverifiable config that might not even match what gets
+# deployed — worse than no policy, since it reads as done when it isn't.
+# A default-deny AuthorizationPolicy specifically must NOT be added
+# without its matching allow-rules in the same change: on a real cluster
+# it would immediately block every request into vektor-backend and
+# vektor-web, including Kong's own ingress traffic.
 #
 # The concrete call graph, established from actually reading
-# vektor-platform's source (not guessed) so whoever adds this doesn't have
+# vektor-backend's source (not guessed) so whoever adds this doesn't have
 # to re-derive it:
 #   - coa-svc -> audit-svc      (POST /api/v1/audit, services/coa-svc/src/audit/client.ts)
 #   - coa-svc -> fusion-svc     (GET no-strike-zones, services/coa-svc/src/context/fetchNoStrikeZones.ts)
-#   - vektor-gateway (Kong) -> every public-facing vektor-platform service (REST ingress)
+#   - vektor-gateway (Kong) -> every public-facing vektor-backend service (REST ingress)
 # fusion-svc -> alert-svc is NOT an HTTP call (BullMQ over Redis), so it has
 # no Istio-mesh AuthorizationPolicy analog.

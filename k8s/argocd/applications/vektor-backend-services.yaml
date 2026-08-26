@@ -1,8 +1,8 @@
-# GitOps entry point for every vektor-platform service — §9.3: "image tags
+# GitOps entry point for every vektor-backend service — §9.3: "image tags
 # consumed via GitOps PR". One ApplicationSet instead of one Application per
 # service, since the service list is just the §9.6 services/ directory.
 #
-# Each service's chart lives at vektor-platform/services/<name>/deploy/helm
+# Each service's chart lives at vektor-backend/services/<name>/deploy/helm
 # — that path is created by that service's own roadmap task (SVC-001,
 # ML-002, etc., see ../../../../vektor-docs/docs/09-roadmap.md), not by this
 # repo. Until a service's chart exists, ArgoCD will show it OutOfSync/
@@ -11,7 +11,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: vektor-platform-services
+  name: vektor-backend-services
   namespace: argocd
 spec:
   generators:
@@ -29,17 +29,17 @@ spec:
           - service: reporting-svc
   template:
     metadata:
-      name: "vektor-platform-{{service}}"
+      name: "vektor-backend-{{service}}"
       namespace: argocd
     spec:
       project: default
       source:
-        repoURL: https://github.com/vektor/vektor-platform.git
+        repoURL: https://github.com/vektor/vektor-backend.git
         targetRevision: main
         path: "services/{{service}}/deploy/helm"
       destination:
         server: https://kubernetes.default.svc
-        namespace: vektor-platform
+        namespace: vektor-backend
       syncPolicy:
         automated:
           prune: true

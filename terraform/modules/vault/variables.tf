@@ -18,7 +18,7 @@ variable "policy_files" {
   description = "Map of Vault policy name -> path to its .hcl file (see ../../../vault/policies/)."
   type        = map(string)
   default = {
-    "vektor-platform" = "../../../vault/policies/vektor-platform.hcl"
-    "vektor-ml"       = "../../../vault/policies/vektor-ml.hcl"
+    "vektor-backend" = "../../../vault/policies/vektor-backend.hcl"
+    "vektor-ml"      = "../../../vault/policies/vektor-ml.hcl"
   }
 }

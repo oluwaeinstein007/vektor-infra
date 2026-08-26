@@ -1,5 +1,5 @@
 # INFRA-004 — Deploy Kafka cluster (3 brokers + Schema Registry).
-# kafkajs (vektor-platform) and the Schema Registry are the only two things
+# kafkajs (vektor-backend) and the Schema Registry are the only two things
 # every downstream service (ingest-svc, fusion-svc, alert-svc, ...) depends
 # on for the event backbone described in §9.7.
 

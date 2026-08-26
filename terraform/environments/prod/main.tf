@@ -3,11 +3,23 @@
 # invented — see the inline citations. Same module set as dev; only the
 # variable values differ.
 
-resource "kubernetes_namespace_v1" "vektor_platform" {
+resource "kubernetes_namespace_v1" "vektor_backend" {
   metadata {
-    name = "vektor-platform"
+    name = "vektor-backend"
     labels = {
-      "vektor.io/tier" = "platform"
+      "vektor.io/tier" = "backend"
+    }
+  }
+}
+
+# The frontend namespace (vektor-web: apps/web, and eventually field-pwa) —
+# split out from the above when vektor-platform became vektor-backend +
+# vektor-web (§9.2).
+resource "kubernetes_namespace_v1" "vektor_web" {
+  metadata {
+    name = "vektor-web"
+    labels = {
+      "vektor.io/tier" = "web"
     }
   }
 }
@@ -65,5 +77,5 @@ module "gateway" {
 module "istio" {
   source = "../../modules/istio"
 
-  depends_on = [kubernetes_namespace_v1.vektor_platform, module.gateway]
+  depends_on = [kubernetes_namespace_v1.vektor_backend, kubernetes_namespace_v1.vektor_web, module.gateway]
 }

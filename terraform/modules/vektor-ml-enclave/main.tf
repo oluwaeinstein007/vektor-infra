@@ -9,7 +9,7 @@
 # What this module deliberately does NOT do, because §14.2 forbids it:
 #   - no egress rule to PostgreSQL/Redis/MinIO — storage access is proxied
 #     through TypeScript services, never called directly from the enclave
-#   - no shared volumes with any vektor-platform workload (§9.3, §9.5)
+#   - no shared volumes with any vektor-backend or vektor-web workload (§9.3, §9.5)
 # Image scanning (Trivy) and repo write-access restriction are enforced
 # outside this repo — vektor-ml's own CI (§9.8) and GitHub team permissions
 # (§9.9), respectively.

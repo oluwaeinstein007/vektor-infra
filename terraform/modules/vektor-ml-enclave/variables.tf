@@ -7,7 +7,7 @@ variable "namespace" {
 variable "platform_namespace" {
   description = "Namespace coa-svc (the only permitted gRPC caller) runs in."
   type        = string
-  default     = "vektor-platform"
+  default     = "vektor-backend"
 }
 
 variable "observability_namespace" {

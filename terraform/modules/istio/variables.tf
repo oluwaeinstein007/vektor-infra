@@ -12,5 +12,5 @@ variable "chart_version" {
 variable "mesh_namespaces" {
   description = "Namespaces that get the istio-injection=enabled label. SEC-001 scopes mTLS enforcement to 'all TS services' specifically — vektor-ml-enclave is deliberately excluded, since the Python enclave's isolation is enforced by NetworkPolicy (terraform/modules/vektor-ml-enclave) per §14.2, not the mesh."
   type        = list(string)
-  default     = ["vektor-platform", "vektor-gateway"]
+  default     = ["vektor-backend", "vektor-web", "vektor-gateway"]
 }

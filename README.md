@@ -24,7 +24,7 @@ terraform/
   environments/
     dev/     One k3s node, everything downsized, local state
     prod/    §11.2/§11.3-sized, Kubernetes-Secret state backend
-k8s/argocd/applications/   GitOps entry points for vektor-platform + vektor-ml workloads
+k8s/argocd/applications/   GitOps entry points for vektor-backend + vektor-web + vektor-ml workloads
 vault/policies/             HCL policies, one per repo's trust boundary (§14.2)
 scripts/                     Cluster bootstrap (dev only — see above)
 ```

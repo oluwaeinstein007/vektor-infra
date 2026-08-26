@@ -37,7 +37,7 @@ resource "helm_release" "minio" {
     value = var.minio_storage_class
   }
   # Buckets referenced by §12.4's retention policy — created at install time
-  # so vektor-platform's storage-svc code never has to special-case "does
+  # so vektor-backend's storage-svc code never has to special-case "does
   # this bucket exist yet".
   set {
     name  = "provisioning.enabled"

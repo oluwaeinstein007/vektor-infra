@@ -25,7 +25,7 @@ resource "helm_release" "kube_prometheus_stack" {
     name  = "prometheus.prometheusSpec.retention"
     value = var.prometheus_retention
   }
-  # Auto-discover ServiceMonitors from every namespace — each vektor-platform
+  # Auto-discover ServiceMonitors from every namespace — each vektor-backend
   # service ships its own ServiceMonitor next to its Deployment rather than
   # this repo hand-listing every scrape target.
   set {

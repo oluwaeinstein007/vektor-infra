@@ -28,6 +28,12 @@ variable "metrics_port" {
   default     = 9090
 }
 
+variable "dns_namespace" {
+  description = "SEC-002: namespace CoreDNS (or equivalent) runs in — the enclave's DNS-egress hole is scoped to only this namespace, not the whole cluster. Defaults to kube-system (k3s and most standard clusters); override for a cluster with DNS elsewhere."
+  type        = string
+  default     = "kube-system"
+}
+
 variable "resource_quota" {
   description = "Hard resource ceiling for the whole enclave namespace — §14.2 'resource quotas enforced (CPU, memory, GPU) to prevent runaway processes'."
   type = object({

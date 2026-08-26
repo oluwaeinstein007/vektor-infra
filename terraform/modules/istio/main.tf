@@ -62,3 +62,33 @@ resource "kubernetes_manifest" "mesh_peer_auth" {
   }
   depends_on = [helm_release.istiod]
 }
+
+# SEC-002 audit note (2026-08-26): this module deliberately stops at STRICT
+# mTLS (L4 transport identity — "is this sidecar-to-sidecar traffic
+# authenticated") and does NOT add AuthorizationPolicy resources (L7 —
+# "is this specific caller allowed to call this specific service"). Every
+# other network-boundary module in this repo (vektor-ml-enclave) pairs its
+# default-deny with concrete named allow-rules; doing the same here would
+# require matching on each workload's Kubernetes ServiceAccount identity
+# (`source.principals: ["cluster.local/ns/<ns>/sa/<name>"]`), and no
+# ServiceAccount-per-service naming convention exists yet anywhere in this
+# repo — actual Deployment manifests (and therefore ServiceAccounts) are
+# expected to land in vektor-platform's own repo per-service, the same
+# "this repo is bootstrap/ops tooling, application manifests land next to
+# the application" split vektor-edge's README documents for its own
+# placeholder image tags. Writing AuthorizationPolicy rules against guessed
+# ServiceAccount names now would be unverifiable config that might not even
+# match what gets deployed — worse than no policy, since it reads as done
+# when it isn't. A default-deny AuthorizationPolicy specifically must NOT
+# be added without its matching allow-rules in the same change: on a real
+# cluster it would immediately block every request into vektor-platform,
+# including Kong's own ingress traffic.
+#
+# The concrete call graph, established from actually reading
+# vektor-platform's source (not guessed) so whoever adds this doesn't have
+# to re-derive it:
+#   - coa-svc -> audit-svc      (POST /api/v1/audit, services/coa-svc/src/audit/client.ts)
+#   - coa-svc -> fusion-svc     (GET no-strike-zones, services/coa-svc/src/context/fetchNoStrikeZones.ts)
+#   - vektor-gateway (Kong) -> every public-facing vektor-platform service (REST ingress)
+# fusion-svc -> alert-svc is NOT an HTTP call (BullMQ over Redis), so it has
+# no Istio-mesh AuthorizationPolicy analog.

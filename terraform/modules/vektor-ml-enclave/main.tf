@@ -59,6 +59,14 @@ resource "kubernetes_network_policy_v1" "default_deny" {
 # The one permitted runtime call in the whole architecture: coa-svc ->
 # llm-cloud-svc over gRPC (vektor-proto/proto/llm.proto). No other TS
 # service, and nothing outside the cluster, may reach the enclave.
+#
+# SEC-002 audit note: cv-train-svc (this enclave's other named service, per
+# the module header) deliberately gets no matching ingress-allow rule — it's
+# a CLI-driven batch training job (vektor-ml/cv-train-svc/src/cv_train_svc/
+# {cli,train,export}.py), not a server with any inbound listener. The
+# default-deny-all policy above is already the correct, complete posture for
+# it; adding an ingress rule for a service nothing ever calls would be an
+# unused hole, not a fix.
 resource "kubernetes_network_policy_v1" "allow_grpc_from_coa_svc" {
   metadata {
     name      = "allow-grpc-from-coa-svc"
@@ -121,6 +129,14 @@ resource "kubernetes_network_policy_v1" "allow_metrics_scrape" {
 # DNS resolution is the only egress hole — every enclave pod needs it to
 # resolve the K8s service DNS name for its own sidecar/health endpoints, but
 # gets nothing else outbound (§14.2: no direct storage access).
+#
+# SEC-002 audit fix (2026-08-26): this used to select `namespace_selector {}`
+# with no match_labels — a bare empty block still means "any namespace," so
+# the egress hole was effectively "port 53 to anywhere in the cluster," not
+# just to CoreDNS. Narrowed to var.dns_namespace (defaults to "kube-system",
+# where CoreDNS lives on k3s and most standard clusters); a cluster with
+# DNS elsewhere overrides the variable rather than reopening this to
+# everything again.
 resource "kubernetes_network_policy_v1" "allow_dns_egress" {
   metadata {
     name      = "allow-dns-egress"
@@ -131,7 +147,11 @@ resource "kubernetes_network_policy_v1" "allow_dns_egress" {
     policy_types = ["Egress"]
     egress {
       to {
-        namespace_selector {}
+        namespace_selector {
+          match_labels = {
+            "kubernetes.io/metadata.name" = var.dns_namespace
+          }
+        }
       }
       ports {
         port     = 53

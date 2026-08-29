@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/vektor/vektor-ml.git
+    repoURL: https://github.com/oluwaeinstein007/vektor-ml.git
     targetRevision: main
     path: llm-cloud-svc/deploy/helm
   destination:
@@ -29,7 +29,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/vektor/vektor-ml.git
+    repoURL: https://github.com/oluwaeinstein007/vektor-ml.git
     targetRevision: main
     path: cv-train-svc/deploy/helm
   destination:

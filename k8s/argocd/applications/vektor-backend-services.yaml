@@ -34,7 +34,7 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/vektor/vektor-backend.git
+        repoURL: https://github.com/oluwaeinstein007/vektor-backend.git
         targetRevision: main
         path: "services/{{service}}/deploy/helm"
       destination:

@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/vektor/vektor-web.git
+    repoURL: https://github.com/oluwaeinstein007/vektor-web.git
     targetRevision: main
     path: apps/web/deploy/helm
   destination:
@@ -27,7 +27,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/vektor/vektor-web.git
+    repoURL: https://github.com/oluwaeinstein007/vektor-web.git
     targetRevision: main
     path: apps/field-pwa/deploy/helm
   destination:

@@ -7,7 +7,11 @@
 # ML-002, etc., see ../../../../vektor-docs/docs/09-roadmap.md), not by this
 # repo. Until a service's chart exists, ArgoCD will show it OutOfSync/
 # Missing rather than erroring the whole set — that's expected during
-# Phase 0-1 and clears up as each service lands.
+# Phase 0-1 and clears up as each service lands. All 10 now have real charts
+# (Phase "work on it" pass) - the list here previously had a nonexistent
+# `auth-svc` entry (packages/auth is a shared library other services import,
+# never its own deployable service) and was missing map-tile-server and
+# edge-sync-svc entirely, both real services with real charts now.
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
@@ -22,11 +26,12 @@ spec:
           - service: fusion-svc
           - service: coa-svc
           - service: alert-svc
-          - service: auth-svc
           - service: audit-svc
           - service: geospatial-svc
           - service: logistics-svc
           - service: reporting-svc
+          - service: map-tile-server
+          - service: edge-sync-svc
   template:
     metadata:
       name: "vektor-backend-{{service}}"
@@ -35,7 +40,7 @@ spec:
       project: default
       source:
         repoURL: https://github.com/oluwaeinstein007/vektor-backend.git
-        targetRevision: main
+        targetRevision: master
         path: "services/{{service}}/deploy/helm"
       destination:
         server: https://kubernetes.default.svc

@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/oluwaeinstein007/vektor-web.git
-    targetRevision: main
+    targetRevision: master
     path: apps/web/deploy/helm
   destination:
     server: https://kubernetes.default.svc
@@ -28,7 +28,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/oluwaeinstein007/vektor-web.git
-    targetRevision: main
+    targetRevision: master
     path: apps/field-pwa/deploy/helm
   destination:
     server: https://kubernetes.default.svc

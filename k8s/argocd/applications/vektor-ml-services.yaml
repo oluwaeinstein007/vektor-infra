@@ -11,7 +11,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/oluwaeinstein007/vektor-ml.git
-    targetRevision: main
+    targetRevision: master
     path: llm-cloud-svc/deploy/helm
   destination:
     server: https://kubernetes.default.svc
@@ -30,7 +30,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/oluwaeinstein007/vektor-ml.git
-    targetRevision: main
+    targetRevision: master
     path: cv-train-svc/deploy/helm
   destination:
     server: https://kubernetes.default.svc

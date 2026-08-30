@@ -9,7 +9,7 @@ on:
       - "terraform/**"
       - "policy/**"
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - "terraform/**"
       - "policy/**"
